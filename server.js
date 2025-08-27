@@ -6,8 +6,8 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const USERNAME = "USERNAME"; // ganti
-const REPO = "REPO";         // ganti
+const USERNAME = "ekal123"; // ganti
+const REPO = "DatabaseWhatsapp";         // ganti
 const BRANCH = "main";       // branch repo
 const FILE_PATH = "numbers.json"; 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
