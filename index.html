@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; background: #f1f5f9; }
+    .box { background: #fff; padding: 1.5rem; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+    input, button { width: 100%; padding: .7rem; margin-top: .5rem; border: 1px solid #ccc; border-radius: 6px;}
+    button { background: #4361ee; color: #fff; font-weight: bold; border: none; cursor: pointer;}
+    button:hover { background: #3a56d4; }
+    ul { margin-top: 1rem; padding: 0; list-style: none;}
+    li { padding: .3rem 0; }
+  </style>
+</head>
+<body>
+  <div class="box" id="loginBox">
+    <h2><i class="fas fa-lock"></i> Login Admin</h2>
+    <form id="formLogin">
+      <input type="password" id="password" placeholder="Masukkan password admin" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <div class="box" id="panelBox" style="display:none;">
+    <h2><i class="fas fa-database"></i> Admin Database</h2>
+    
+    <h3>📋 Senarai Nombor</h3>
+    <ul id="list"></ul>
+    <hr>
+
+    <h3>➕ Tambah Nombor</h3>
+    <form id="formAdd">
+      <input type="text" id="numberAdd" placeholder="Masukkan nombor baru" required>
+      <button type="submit">Tambah</button>
+    </form>
+    <hr>
+
+    <h3>🗑️ Padam Nombor</h3>
+    <form id="formDelete">
+      <input type="text" id="numberDelete" placeholder="Masukkan nombor untuk dipadam" required>
+      <button type="submit">Padam</button>
+    </form>
+  </div>
+
+  <script>
+    const ADMIN_PASS = "12345"; // 🔑 password admin
+
+    // login
+    document.getElementById("formLogin").addEventListener("submit", e => {
+      e.preventDefault();
+      const pass = document.getElementById("password").value;
+      if(pass === ADMIN_PASS){
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("panelBox").style.display = "block";
+        loadNumbers();
+      } else {
+        alert("Password salah!");
+      }
+    });
+
+    // load nombor
+    async function loadNumbers() {
+      const res = await fetch("/numbers");
+      const data = await res.json();
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      data.forEach(n => {
+        const li = document.createElement("li");
+        li.textContent = n;
+        list.appendChild(li);
+      });
+    }
+
+    // tambah nombor
+    document.getElementById("formAdd").addEventListener("submit", async e => {
+      e.preventDefault();
+      const number = document.getElementById("numberAdd").value;
+      const res = await fetch("/add-number", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ number })
+      });
+      const data = await res.json();
+      alert(data.message || "Error");
+      document.getElementById("numberAdd").value = "";
+      loadNumbers();
+    });
+
+    // delete nombor
+    document.getElementById("formDelete").addEventListener("submit", async e => {
+      e.preventDefault();
+      const number = document.getElementById("numberDelete").value;
+      const res = await fetch("/delete-number", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ number })
+      });
+      const data = await res.json();
+      alert(data.message || "Error");
+      document.getElementById("numberDelete").value = "";
+      loadNumbers();
+    });
+  </script>
+</body>
+</html>
